@@ -1,33 +1,4 @@
-# from simpletransformers.classification import ClassificationModel
-# import logging
-# import os
 
-# # Set logging level
-# logging.basicConfig(level=logging.ERROR)
-
-# # Define model directory
-# MODEL_DIR = "./my_saved_model"
-
-# # Load or download the model
-# if not os.path.exists(MODEL_DIR) or not os.path.exists(os.path.join(MODEL_DIR, "pytorch_model.bin")):
-#     print("Model not found locally, downloading pretrained model...")
-#     model = ClassificationModel(
-#     "bert", 
-#     "textattack/bert-base-uncased-SST-2", 
-#     num_labels=2,
-#     use_cuda=False,
-#     args={"reprocess_input_data": True, "overwrite_output_dir": True},
-# )
-
-#     model.save_model(MODEL_DIR)
-# else:
-#     model = ClassificationModel(
-#         "bert", MODEL_DIR, use_cuda=False
-#     )
-
-# def predict_text(text: str):
-#     predictions, _ = model.predict([text])
-#     return {"prediction": int(predictions[0])}
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from scipy.special import softmax
 import torch
