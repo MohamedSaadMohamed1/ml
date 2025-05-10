@@ -1,4 +1,3 @@
-
 from transformers import AutoTokenizer, AutoModelForSequenceClassification
 from scipy.special import softmax
 import torch
@@ -23,7 +22,20 @@ def predict_text(text: str):
     # Apply softmax to get probabilities
     scores = softmax(output.logits[0].numpy())
     prediction = labels[scores.argmax()]
-    return {"prediction": prediction, "scores": dict(zip(labels, map(float, scores)))}
+    
+    # Map sentiment to risk levels
+    if scores[0] > 0.7:  # High negative sentiment
+        risk = "High"
+    elif scores[1] > 0.5:  # Neutral sentiment
+        risk = "Moderate"
+    else:  # Positive sentiment
+        risk = "Low"
+    
+    return {
+        "prediction": prediction,
+        "scores": dict(zip(labels, map(float, scores))),
+        "risk": risk
+    }
 
 # Example usage
 text = "not good"
