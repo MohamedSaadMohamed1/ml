@@ -12,6 +12,7 @@ from typing import Optional
 import pandas as pd
 
 
+# ----- FastAPI App -----
 app = FastAPI()
 
 # ----- Input/Output Models -----
@@ -29,13 +30,23 @@ class EmployeeOutput(BaseModel):
 
 # ----- Neutrosophic Computation -----
 def compute_neutrosophic_values(risk: str, working_hours: int):
-    risk_truth = {'High Risk': 1.0, 'Moderate Risk': 0.7, 'Low Risk': 0.3}
-    working_hours_indeterminacy = {20: 0.2, 35: 0.5, 45: 0.7, 50: 0.9}
-    
+    risk_truth = {'High': 1.0, 'Moderate': 0.7, 'Low': 0.3}
     T = risk_truth.get(risk, 0.0)
-    I = working_hours_indeterminacy.get(working_hours, 0.0)
-    F = max(0, 1 - T - I)
-    
+
+    # Indeterminacy Calculation
+    min_hours = 20
+    max_hours = 60
+    min_I = 0.1
+    max_I = 0.9
+
+    # Clamp and normalize working hours
+    clamped_hours = max(min_hours, min(working_hours, max_hours))
+    I = min_I + ((clamped_hours - min_hours) / (max_hours - min_hours)) * (max_I - min_I)
+    I = round(I, 2)
+
+    F = round(max(0, 1 - T - I), 2)
+    T = round(T, 2)
+
     return T, I, F
 
 # ----- Read Recommendation from Excel -----
@@ -63,20 +74,20 @@ def refined_recommendation(T: float, I: float, F: float, base: str):
 async def process_employee(employee: EmployeeInput):
     T, I, F = compute_neutrosophic_values(employee.Risk, employee.Working_Hours)
     file_recommendation = get_recommendation_from_file(employee.Risk, employee.Working_Hours)
-    
+
     if not file_recommendation:
-        raise ValueError("Recommendation not found in file for given risk and working hours.")
-    
+        raise HTTPException(status_code=404, detail="Recommendation not found for given input.")
+
     refined = refined_recommendation(T, I, F, file_recommendation)
 
-    return {
-        "Risk": employee.Risk,
-        "Working_Hours": employee.Working_Hours,
-        "Truth": T,
-        "Indeterminacy": I,
-        "Falsity": F,
-        "Refined_Recommendation": refined
-    }
+    return EmployeeOutput(
+        Risk=employee.Risk,
+        Working_Hours=employee.Working_Hours,
+        Truth=T,
+        Indeterminacy=I,
+        Falsity=F,
+        Refined_Recommendation=refined
+    )
 
 # ------------------ API Endpoints ------------------
 @app.post("/predict")
