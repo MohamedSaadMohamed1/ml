@@ -3,7 +3,6 @@ FROM python:3.9-slim
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
     PORT=8000 \
-    # Reduce PyTorch memory usage
     OMP_NUM_THREADS=1 \
     MKL_NUM_THREADS=1 \
     OPENBLAS_NUM_THREADS=1
