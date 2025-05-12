@@ -49,6 +49,7 @@ def compute_neutrosophic_values(risk: str, working_hours: int):
 
     return T, I, F
 
+
 # ----- Read Recommendation from Excel -----
 def get_recommendation_from_file(risk: str, working_hours: int) -> Optional[str]:
     try:
