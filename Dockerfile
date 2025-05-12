@@ -5,7 +5,9 @@ ENV PYTHONUNBUFFERED=1 \
     PORT=8000 \
     OMP_NUM_THREADS=1 \
     MKL_NUM_THREADS=1 \
-    OPENBLAS_NUM_THREADS=1
+    OPENBLAS_NUM_THREADS=1 \
+    # Disable Hugging Face warnings
+    DISABLE_HUGGINGFACE_HUB_WARNINGS=1
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
@@ -17,10 +19,7 @@ WORKDIR /app
 
 COPY requirements.txt .
 
-# First install PyTorch with CPU-only version from PyTorch's official repo
-RUN pip install --no-cache-dir torch==2.0.1 --index-url https://download.pytorch.org/whl/cpu
-
-# Then install remaining requirements
+# Install dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Clean up

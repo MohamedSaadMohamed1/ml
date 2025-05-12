@@ -4,5 +4,6 @@ python-jose[cryptography]==3.3.0
 passlib[bcrypt]==1.7.4
 cryptography==40.0.2
 torch==2.0.1 --index-url https://download.pytorch.org/whl/cpu
-transformers==4.28.1
-simpletransformers==0.63.11
+transformers==4.40.1  # Updated to latest stable version
+simpletransformers==0.64.0  # Updated version
+huggingface-hub==0.22.2  # Explicitly add the hub library
