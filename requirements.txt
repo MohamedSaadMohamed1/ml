@@ -1,8 +1,8 @@
-
-fastapi
-uvicorn
-python-jose[cryptography]
-passlib[bcrypt]
-cryptography
-simpletransformers
-transformers
+fastapi==0.95.2
+uvicorn==0.22.0
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+cryptography==40.0.2
+torch==2.0.1+cpu --index-url https://download.pytorch.org/whl/cpu
+transformers==4.28.1
+simpletransformers==0.63.11

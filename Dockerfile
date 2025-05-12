@@ -1,24 +1,35 @@
-# Use an official Python runtime as a parent image
 FROM python:3.9-slim
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1 \
-    PORT=8000
+    PORT=8000 \
+    # Reduce PyTorch memory usage
+    OMP_NUM_THREADS=1 \
+    MKL_NUM_THREADS=1 \
+    OPENBLAS_NUM_THREADS=1
 
-# Set the working directory in the container
+# Install only essential system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    python3-dev \
+    && rm -rf /var/lib/apt/lists/*
+
 WORKDIR /app
 
 # Copy requirements first to leverage Docker cache
 COPY requirements.txt .
 
-# Install any needed packages
+# Install Python dependencies with optimized PyTorch
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy the rest of the application
+# Clean up to reduce image size
+RUN apt-get remove -y gcc python3-dev \
+    && apt-get autoremove -y \
+    && rm -rf /root/.cache/pip
+
 COPY . .
 
-# Expose the port the app runs on
 EXPOSE 8000
 
-# Run the application
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
+# Run with single worker to conserve memory
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
